@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:busines_logic_component/firebase_options.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -29,7 +31,15 @@ class NotificationsBloc extends Bloc<NotificationStatusChanged, NotificationsSta
     add(NotificationStatusChanged(settings.authorizationStatus));
   }
 
-  void _getFCMToken() async {}
+  void _getFCMToken() async {
+    final settings = await messaging.getNotificationSettings();
+
+    if (settings.authorizationStatus != AuthorizationStatus.authorized) return;
+
+    final token = await messaging.getToken();
+
+    log(token ?? "");
+  }
 
   static Future<void> initalizeFirebase() async {
     await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
@@ -39,6 +49,8 @@ class NotificationsBloc extends Bloc<NotificationStatusChanged, NotificationsSta
     final settings = await messaging.getNotificationSettings();
 
     add(NotificationStatusChanged(settings.authorizationStatus));
+
+    _getFCMToken();
   }
 
   void _notificationStatusChanged(NotificationStatusChanged event, Emitter<NotificationsState> emit) {
