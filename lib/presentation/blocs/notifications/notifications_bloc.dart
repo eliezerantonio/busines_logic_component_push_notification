@@ -9,6 +9,12 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 part 'notifications_event.dart';
 part 'notifications_state.dart';
 
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+
+  print("handling bacgroundd message $message");
+}
+
 class NotificationsBloc extends Bloc<NotificationStatusChanged, NotificationsState> {
   FirebaseMessaging messaging = FirebaseMessaging.instance;
 
@@ -16,6 +22,7 @@ class NotificationsBloc extends Bloc<NotificationStatusChanged, NotificationsSta
     on<NotificationStatusChanged>(_notificationStatusChanged);
 
     _initialStatusCheck();
+    _onForegroundMessage();
   }
 
   void requestPermission() async {
@@ -29,6 +36,12 @@ class NotificationsBloc extends Bloc<NotificationStatusChanged, NotificationsSta
     );
 
     add(NotificationStatusChanged(settings.authorizationStatus));
+  }
+
+  void _handleRemoteMessage(RemoteMessage message) {}
+
+  void _onForegroundMessage() {
+    FirebaseMessaging.onMessage.listen(_handleRemoteMessage);
   }
 
   void _getFCMToken() async {
