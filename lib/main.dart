@@ -4,7 +4,9 @@ import 'package:busines_logic_component/presentation/blocs/notifications/notific
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await NotificationsBloc.initalizeFirebase();
   runApp(
     MultiBlocProvider(
       providers: [
